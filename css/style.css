@@ -1,0 +1,872 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#0d1226;
+    color:white;
+    font-family:Arial,sans-serif;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    height:100vh;
+}
+
+.container{
+    text-align:center;
+}
+
+h1{
+    font-size:48px;
+    margin-bottom:10px;
+}
+
+.studio{
+    color:#bbbbbb;
+    margin-bottom:30px;
+}
+
+button{
+    padding:15px 35px;
+    font-size:20px;
+
+    border:none;
+    border-radius:12px;
+
+    background:#4d7cff;
+    color:white;
+
+    cursor:pointer;
+}
+
+button:active{
+    transform:scale(0.95);
+}
+
+#game{
+    text-align:center;
+}
+
+#board{
+    width:336px;
+    margin:20px auto;
+
+    display:grid;
+    grid-template-columns:repeat(8,40px);
+    gap:2px;
+}
+
+.tile{
+    width:40px;
+    height:40px;
+
+    border-radius:14px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:26px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    box-shadow:
+        inset 0 2px 4px rgba(255,255,255,.4),
+        inset 0 -3px 6px rgba(0,0,0,.4),
+        0 0 8px rgba(255,255,255,.15);
+}
+
+.tile:hover{
+
+    transform:scale(1.08);
+
+}
+
+.selected{
+    transform: scale(1.12);
+    border:3px solid white;
+    box-shadow:0 0 20px white;
+}
+
+.gem{
+
+    position:relative;
+
+    width:34px;
+    height:34px;
+
+    clip-path:polygon(
+        50% 0%,
+        82% 20%,
+        92% 50%,
+        72% 92%,
+        28% 92%,
+        8% 50%,
+        18% 20%
+    );
+
+    transition:.18s;
+
+    box-shadow:
+    inset 0 3px 6px rgba(255,255,255,.75),
+    inset 0 -5px 8px rgba(0,0,0,.35),
+    0 4px 8px rgba(0,0,0,.35),
+    0 0 12px rgba(255,255,255,.18);
+
+    overflow:hidden;
+
+}
+
+.gem::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:5px;
+    top:4px;
+
+    width:12px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.65);
+
+    filter:blur(1px);
+
+}
+
+.gem::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.35),
+        transparent 40%,
+        transparent 60%,
+        rgba(255,255,255,.12)
+    );
+
+}
+
+.gem:hover{
+
+    transform:scale(1.12);
+
+    filter:brightness(1.15);
+
+}
+
+.blue{
+background:linear-gradient(
+135deg,
+#d8f8ff,
+#58c8ff,
+#005eff
+);
+}
+
+.red{
+background:linear-gradient(
+135deg,
+#ffd9d9,
+#ff5757,
+#b00000
+);
+}
+
+.green{
+background:linear-gradient(
+135deg,
+#ddffd9,
+#46d76f,
+#00853d
+);
+}
+
+.yellow{
+background:linear-gradient(
+135deg,
+#fffbc7,
+#ffd83f,
+#cc9600
+);
+}
+
+.purple{
+background:linear-gradient(
+135deg,
+#f0d8ff,
+#bf63ff,
+#6b19c7
+);
+}
+
+.orange{
+background:linear-gradient(
+135deg,
+#ffe4c2,
+#ffa33c,
+#d76500
+);
+}
+
+/* ===========================
+   ROCKET
+=========================== */
+
+.rocket{
+
+    position:relative;
+
+    width:34px;
+    height:34px;
+
+    border-radius:12px;
+
+    background:linear-gradient(
+        180deg,
+        #f8f8f8,
+        #c9c9c9,
+        #7d7d7d
+    );
+
+    box-shadow:
+        0 0 12px rgba(255,255,255,.45),
+        inset 0 2px 3px rgba(255,255,255,.8);
+
+}
+
+.rocket::after{
+
+    content:"🚀";
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    font-size:22px;
+
+}
+
+.rocketH::after{
+
+    transform:
+        translate(-50%,-50%)
+        rotate(90deg);
+
+}
+
+.rocketH{
+
+    box-shadow:
+        0 0 15px #55ccff,
+        inset 0 2px 3px rgba(255,255,255,.8);
+
+}
+
+.rocketV{
+
+    box-shadow:
+        0 0 15px #66ff88,
+        inset 0 2px 3px rgba(255,255,255,.8);
+
+}
+
+@keyframes pop{
+
+0%{
+transform:scale(1);
+}
+
+40%{
+transform:scale(1.25);
+}
+
+100%{
+transform:scale(0);
+opacity:0;
+}
+
+}
+
+.pop{
+    animation: explode .35s ease forwards;
+}
+
+@keyframes explode{
+
+0%{
+transform:scale(1);
+filter:brightness(1);
+opacity:1;
+}
+
+30%{
+transform:scale(1.35) rotate(8deg);
+filter:brightness(2);
+}
+
+70%{
+transform:scale(.6);
+filter:brightness(3);
+}
+
+100%{
+transform:scale(0);
+opacity:0;
+}
+
+}
+
+.tile.pop{
+box-shadow:
+0 0 10px gold,
+0 0 25px gold,
+0 0 40px white;
+}
+
+.shake{
+animation:shake .18s;
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+25%{transform:translateX(-4px);}
+50%{transform:translateX(4px);}
+75%{transform:translateX(-4px);}
+100%{transform:translateX(0);}
+
+}
+
+#comboText{
+
+position:fixed;
+left:50%;
+top:35%;
+
+transform:translate(-50%,-50%) scale(.5);
+
+font-size:42px;
+font-weight:bold;
+
+color:#ffd700;
+
+text-shadow:
+0 0 10px white,
+0 0 20px gold,
+0 0 40px orange;
+
+opacity:0;
+
+pointer-events:none;
+
+z-index:9999;
+
+}
+
+.comboShow{
+
+animation:comboAnim .8s ease;
+
+}
+
+@keyframes comboAnim{
+
+0%{
+
+opacity:0;
+transform:translate(-50%,-50%) scale(.4);
+
+}
+
+30%{
+
+opacity:1;
+transform:translate(-50%,-50%) scale(1.3);
+
+}
+
+70%{
+
+opacity:1;
+transform:translate(-50%,-50%) scale(1);
+
+}
+
+100%{
+
+opacity:0;
+transform:translate(-50%,-80%) scale(1.5);
+
+}
+
+}
+
+/* ===========================
+   BOMB
+=========================== */
+
+.bomb{
+
+    position:relative;
+
+    width:34px;
+    height:34px;
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(circle at 35% 30%,
+    #666,
+    #222 60%,
+    #000);
+
+    box-shadow:
+        0 0 18px rgba(255,120,0,.45),
+        inset 0 2px 4px rgba(255,255,255,.35);
+
+}
+
+.bomb::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:4px;
+    height:10px;
+
+    background:#d8b15c;
+
+    left:50%;
+    top:-6px;
+
+    transform:translateX(-50%) rotate(-25deg);
+
+    border-radius:2px;
+
+}
+
+.bomb::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:8px;
+    height:8px;
+
+    background:orange;
+
+    border-radius:50%;
+
+    left:50%;
+    top:-10px;
+
+    transform:translateX(-50%);
+
+    box-shadow:
+        0 0 10px yellow,
+        0 0 18px orange;
+
+    animation:fuseFire .5s infinite alternate;
+
+}
+
+@keyframes fuseFire{
+
+    from{
+
+        transform:
+        translateX(-50%)
+        scale(.8);
+
+    }
+
+    to{
+
+        transform:
+        translateX(-50%)
+        scale(1.2);
+
+    }
+
+}
+
+/* ===========================
+   RAINBOW
+=========================== */
+
+.rainbow{
+
+    position:relative;
+
+    width:34px;
+    height:34px;
+
+    border-radius:50%;
+
+    background:
+    conic-gradient(
+        red,
+        orange,
+        yellow,
+        lime,
+        cyan,
+        blue,
+        purple,
+        red
+    );
+
+    animation:
+       
+
+@keyframes popGem{
+
+0%{
+transform:scale(1);
+opacity:1;
+}
+
+40%{
+transform:scale(1.25);
+}
+
+100%{
+transform:scale(0);
+opacity:0;
+}
+
+}
+
+.pop{
+
+animation:popGem .22s forwards;
+
+}
+
+@keyframes boardShake{
+
+0%{
+transform:translateX(0);
+}
+
+25%{
+transform:translateX(-4px);
+}
+
+50%{
+transform:translateX(4px);
+}
+
+75%{
+transform:translateX(-2px);
+}
+
+100%{
+transform:translateX(0);
+}
+
+}
+
+.shake{
+
+animation:boardShake .18s;
+
+}
+
+#comboText{
+
+position:fixed;
+
+left:50%;
+top:35%;
+
+transform:translate(-50%,-50%) scale(.5);
+
+font-size:42px;
+font-weight:bold;
+
+color:#ffd700;
+
+opacity:0;
+
+pointer-events:none;
+
+text-shadow:
+0 0 10px #fff,
+0 0 20px orange;
+
+z-index:999;
+
+}
+
+.comboShow{
+
+animation:comboPop .8s forwards;
+
+}
+
+@keyframes comboPop{
+
+0%{
+
+opacity:0;
+transform:translate(-50%,-50%) scale(.3);
+
+}
+
+20%{
+
+opacity:1;
+transform:translate(-50%,-50%) scale(1.3);
+
+}
+
+70%{
+
+opacity:1;
+transform:translate(-50%,-50%) scale(1);
+
+}
+
+100%{
+
+opacity:0;
+transform:translate(-50%,-70%) scale(.8);
+
+}
+
+}
+
+.bomb{
+
+background:#222;
+
+border-radius:50%;
+
+position:relative;
+
+}
+
+.bomb::after{
+
+content:"💣";
+
+font-size:34px;
+
+position:absolute;
+
+left:50%;
+top:50%;
+
+transform:translate(-50%,-50%);
+
+}
+
+/* ===== ROCKET ===== */
+
+.rocketH{
+    position:relative;
+    background:
+    linear-gradient(90deg,#6ecbff,#0077ff,#6ecbff);
+}
+
+.rocketH::after{
+    content:"🚀";
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:
+    translate(-50%,-50%)
+    rotate(90deg);
+    font-size:22px;
+}
+
+.rocketH::before{
+    content:"";
+    position:absolute;
+    left:4px;
+    right:4px;
+    top:50%;
+    height:5px;
+    transform:translateY(-50%);
+    background:white;
+    border-radius:20px;
+    opacity:.8;
+}
+
+.rocketV{
+    position:relative;
+    background:
+    linear-gradient(#6ecbff,#0077ff,#6ecbff);
+}
+
+.rocketV::after{
+    content:"🚀";
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    font-size:22px;
+}
+
+.rocketV::before{
+    content:"";
+    position:absolute;
+    top:4px;
+    bottom:4px;
+    left:50%;
+    width:5px;
+    transform:translateX(-50%);
+    background:white;
+    border-radius:20px;
+    opacity:.8;
+}
+
+/* ===========================
+   ROCKET LASER
+=========================== */
+
+.laserH{
+
+    position:absolute;
+
+    left:0;
+    top:50%;
+
+    width:100%;
+    height:10px;
+
+    transform:translateY(-50%);
+
+    background:
+    linear-gradient(
+        90deg,
+        transparent,
+        #8fdcff,
+        white,
+        #8fdcff,
+        transparent
+    );
+
+    box-shadow:
+        0 0 12px cyan,
+        0 0 30px white;
+
+    pointer-events:none;
+
+    animation:laserFlash .22s;
+
+}
+
+.laserV{
+
+    position:absolute;
+
+    left:50%;
+    top:0;
+
+    width:10px;
+    height:100%;
+
+    transform:translateX(-50%);
+
+    background:
+    linear-gradient(
+        transparent,
+        #8fdcff,
+        white,
+        #8fdcff,
+        transparent
+    );
+
+    box-shadow:
+        0 0 12px cyan,
+        0 0 30px white;
+
+    pointer-events:none;
+
+    animation:laserFlash .22s;
+
+}
+
+@keyframes laserFlash{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.5);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* ===========================
+   GEM FALL
+=========================== */
+
+.fall{
+
+    animation:fallGem .22s ease;
+
+}
+
+@keyframes fallGem{
+
+    from{
+
+        transform:
+        translateY(-35px);
+
+        opacity:.5;
+
+    }
+
+    to{
+
+        transform:
+        translateY(0);
+
+        opacity:1;
+
+    }
+
+}
+
+/* ===========================
+   SWAP
+=========================== */
+
+.swap{
+
+    transition:
+    transform .18s ease;
+
+}
