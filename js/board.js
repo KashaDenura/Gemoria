@@ -33,7 +33,9 @@ function randomGem(row = -1, col = -1) {
 
 function createBoard() {
 
+
     boardData = [];
+
 
     for (let row = 0; row < SIZE; row++) {
 
@@ -47,19 +49,24 @@ function createBoard() {
 
     }
 
+
     renderBoard();
+
 
 }
 
 function renderBoard() {
+  
 
     board.innerHTML = "";
+    
 
     for (let row = 0; row < SIZE; row++) {
 
         for (let col = 0; col < SIZE; col++) {
 
             const tile = document.createElement("div");
+            
 
             tile.className = "tile";
             tile.dataset.row = row;
@@ -167,6 +174,8 @@ function touchEnd(e) {
 
 function swipe(tile, dx, dy) {
 
+    if (gameLocked) return;
+
     const row = Number(tile.dataset.row);
     const col = Number(tile.dataset.col);
 
@@ -198,7 +207,7 @@ function swipe(tile, dx, dy) {
 
 }
 
-function swap(r1, c1, r2, c2) {
+function swap(r1, c1, r2, c2){
 
     // Tukar dulu
     const temp = boardData[r1][c1];
@@ -206,6 +215,8 @@ function swap(r1, c1, r2, c2) {
     boardData[r2][c2] = temp;
 
     renderBoard();
+    
+    gameLocked = true;
 
     // Bomb
     if (boardData[r1][c1] === "bomb") {
@@ -221,6 +232,7 @@ function swap(r1, c1, r2, c2) {
         return;
 
     }
+  
 
     // Rocket
     if (
@@ -259,22 +271,28 @@ function swap(r1, c1, r2, c2) {
     }
 
     // Match biasa
-    if (checkMatch()) {
+if (checkMatch()) {
 
-        return;
+    levelMoves++;
+    moves--;
 
-    }
+    updateHUD();
 
-    // Tidak ada match → balik lagi
-    setTimeout(() => {
+    checkGameState();
 
-        const temp2 = boardData[r1][c1];
-
-        boardData[r1][c1] = boardData[r2][c2];
-        boardData[r2][c2] = temp2;
-
-        renderBoard();
-
-    }, 150);
+    return;
 
 }
+
+// Tidak ada match → balikin lagi
+setTimeout(() => {
+
+    const temp = boardData[r1][c1];
+    boardData[r1][c1] = boardData[r2][c2];
+    boardData[r2][c2] = temp;
+
+    renderBoard();
+
+}, 150);
+
+} // <-- PENUTUP FUNGSI swap()

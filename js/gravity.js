@@ -45,9 +45,13 @@ function gravity() {
 
         if (hasMatch()) {
 
-            checkMatch();
+    checkMatch();
 
-        }
+} else {
+
+    gameLocked = false;
+
+}
 
     }, moved ? 180 : 80);
 

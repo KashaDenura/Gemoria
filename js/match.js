@@ -1,195 +1,45 @@
 function checkMatch() {
 
-    let matched = [];
-    let specials = [];
+    // Cari semua match
+    const horizontal = findHorizontalMatches();
+    const vertical = findVerticalMatches();
 
-    // ==========================
-    // HORIZONTAL
-    // ==========================
+    // Gabungkan semua tile yang match
+    const matched = collectMatchedTiles(horizontal, vertical);
 
-    for (let row = 0; row < SIZE; row++) {
-
-        let count = 1;
-
-        for (let col = 1; col <= SIZE; col++) {
-
-            if (
-                col < SIZE &&
-                boardData[row][col] &&
-                boardData[row][col] === boardData[row][col - 1]
-            ) {
-
-                count++;
-
-            } else {
-
-                if (count >= 3) {
-
-                    for (let i = 0; i < count; i++) {
-
-                        matched.push([row, col - 1 - i]);
-
-                    }
-
-                    // Match 5
-                    if (count >= 5) {
-
-                        specials.push({
-                            type: "rainbow",
-                            row: row,
-                            col: col - 3
-                        });
-
-                    }
-
-                    // Match 4
-                    else if (count === 4) {
-
-                        specials.push({
-                            type: "rocketH",
-                            row: row,
-                            col: col - 2
-                        });
-
-                    }
-
-                }
-
-                count = 1;
-
-            }
-
-        }
-
-    }
-
-    // ==========================
-    // VERTIKAL
-    // ==========================
-
-    for (let col = 0; col < SIZE; col++) {
-
-        let count = 1;
-
-        for (let row = 1; row <= SIZE; row++) {
-
-            if (
-
-                row < SIZE &&
-                boardData[row][col] &&
-                boardData[row][col] === boardData[row - 1][col]
-
-            ) {
-
-                count++;
-
-            } else {
-
-                if (count >= 3) {
-
-                    for (let i = 0; i < count; i++) {
-
-                        matched.push([row - 1 - i, col]);
-
-                    }
-
-                    // Match 5
-                    if (count >= 5) {
-
-                        specials.push({
-                            type: "rainbow",
-                            row: row - 3,
-                            col: col
-                        });
-
-                    }
-
-                    // Match 4
-                    else if (count === 4) {
-
-                        specials.push({
-                            type: "rocketV",
-                            row: row - 2,
-                            col: col
-                        });
-
-                    }
-
-                }
-
-                count = 1;
-
-            }
-
-        }
-
-    }
-
-    // ==========================
-    // HAPUS DUPLIKAT
-    // ==========================
-
-    matched = [...new Set(matched.map(JSON.stringify))]
-        .map(JSON.parse);
-
+    // Tidak ada match
     if (matched.length === 0) {
-
+gameLocked = true;
         return false;
 
     }
-    
-        // ==========================
+
+    // Cari special
+    const rockets = detectRockets(horizontal, vertical);
+    const rainbows = detectRainbows(horizontal, vertical);
+    const bombs = detectBombs(matched);
+
+    // Prioritas Rainbow > Bomb > Rocket
+    const specials = mergeSpecials(
+        rainbows,
+        bombs,
+        rockets
+    );
+
+    // ==========================
     // SCORE
     // ==========================
 
     score += matched.length * 10;
-
-    // Bonus special gem
     score += specials.length * 40;
 
-    scoreText.textContent = score;
+    updateHUD();
 
     // ==========================
-    // COMBO TEXT
+    // COMBO
     // ==========================
 
-    const combo = document.getElementById("comboText");
-
-    let text = "";
-
-    if (matched.length >= 10) {
-
-        text = "🌈 INCREDIBLE!";
-
-    } else if (matched.length >= 8) {
-
-        text = "👑 GEM MASTER!";
-
-    } else if (matched.length >= 6) {
-
-        text = "💥 AWESOME!";
-
-    } else if (matched.length >= 5) {
-
-        text = "⚡ GREAT!";
-
-    } else if (matched.length >= 4) {
-
-        text = "🔥 GOOD!";
-
-    }
-
-    if (text !== "") {
-
-        combo.textContent = text;
-
-        combo.classList.remove("comboShow");
-
-        void combo.offsetWidth;
-
-        combo.classList.add("comboShow");
-
-    }
+    showComboText(matched.length);
 
     // ==========================
     // SHAKE
@@ -201,13 +51,13 @@ function checkMatch() {
 
         board.classList.remove("shake");
 
-    }, 180);
+    },180);
 
     // ==========================
     // VIBRATE
     // ==========================
 
-    if (navigator.vibrate) {
+    if(navigator.vibrate){
 
         navigator.vibrate(35);
 
@@ -219,11 +69,11 @@ function checkMatch() {
 
     const tiles = document.querySelectorAll(".tile");
 
-    matched.forEach(([r, c]) => {
+    matched.forEach(tile=>{
 
-        const index = r * SIZE + c;
+        const index = tile.row * SIZE + tile.col;
 
-        if (tiles[index]) {
+        if(tiles[index]){
 
             tiles[index].classList.add("pop");
 
@@ -231,196 +81,514 @@ function checkMatch() {
 
     });
 
-    // Tunggu animasi selesai
-    setTimeout(() => {
-      
-              // ==========================
-        // HAPUS GEM
-        // ==========================
+    // Tunggu animasi
+    setTimeout(()=>{
 
-        matched.forEach(([r, c]) => {
+        // Hapus gem
+        matched.forEach(tile=>{
 
-            boardData[r][c] = null;
+            boardData[tile.row][tile.col]=null;
 
         });
 
-        // ==========================
-        // BUAT SPECIAL GEM
-        // ==========================
+        // Pasang special gem
+        specials.forEach(s=>{
 
-        specials.forEach(s => {
-
-            // Kalau posisi special ikut terhapus,
-            // munculkan kembali sebagai special gem.
-
-            boardData[s.row][s.col] = s.type;
+            boardData[s.row][s.col]=s.type;
 
         });
-
-        // ==========================
-        // DETEKSI BOMB (Bentuk T / L)
-        // ==========================
-
-        const countMap = {};
-
-        matched.forEach(([r, c]) => {
-
-            const key = r + "," + c;
-
-            countMap[key] = (countMap[key] || 0) + 1;
-
-        });
-
-        matched.forEach(([r, c]) => {
-
-            let horizontal = 1;
-            let vertical = 1;
-
-            // kiri
-            let x = c - 1;
-
-            while (
-                x >= 0 &&
-                matched.some(v => v[0] === r && v[1] === x)
-            ) {
-
-                horizontal++;
-                x--;
-
-            }
-
-            // kanan
-            x = c + 1;
-
-            while (
-                x < SIZE &&
-                matched.some(v => v[0] === r && v[1] === x)
-            ) {
-
-                horizontal++;
-                x++;
-
-            }
-
-            // atas
-            let y = r - 1;
-
-            while (
-                y >= 0 &&
-                matched.some(v => v[0] === y && v[1] === c)
-            ) {
-
-                vertical++;
-                y--;
-
-            }
-
-            // bawah
-            y = r + 1;
-
-            while (
-                y < SIZE &&
-                matched.some(v => v[0] === y && v[1] === c)
-            ) {
-
-                vertical++;
-                y++;
-
-            }
-
-            // Bentuk T / L
-
-            if (
-                horizontal >= 3 &&
-                vertical >= 3
-            ) {
-
-                boardData[r][c] = "bomb";
-
-            }
-
-        });
-
-        // ==========================
-        // JATUHKAN GEM
-        // ==========================
 
         gravity();
 
-    }, 220);
+setTimeout(()=>{
+
+    cascade();
+
+},200);
+
+},200);
 
     return true;
 
 }
 
-function hasMatch() {
+function showComboText(total){
 
-    // Horizontal
+    const combo=document.getElementById("comboText");
+
+    let text="";
+
+    if(total>=10){
+
+        text="🌈 INCREDIBLE!";
+
+    }
+
+    else if(total>=8){
+
+        text="👑 GEM MASTER!";
+
+    }
+
+    else if(total>=6){
+
+        text="💥 AWESOME!";
+
+    }
+
+    else if(total>=5){
+
+        text="⚡ GREAT!";
+
+    }
+
+    else if(total>=4){
+
+        text="🔥 GOOD!";
+
+    }
+
+    if(text==="") return;
+
+    combo.textContent=text;
+
+    combo.classList.remove("comboShow");
+
+    void combo.offsetWidth;
+
+    combo.classList.add("comboShow");
+
+}
+
+// ==========================
+// CASCADE SYSTEM
+// ==========================
+
+function cascade(){
+
+    renderBoard();
+
+    setTimeout(()=>{
+
+        if(checkMatch()){
+
+            cascade();
+
+        }else{
+
+            gameLocked = false;
+
+        }
+
+    },250);
+
+}
+
+
+
+
+// ==========================
+// CARI MATCH HORIZONTAL
+// ==========================
+
+function findHorizontalMatches() {
+
+    const matches = [];
+
     for (let row = 0; row < SIZE; row++) {
 
-        let count = 1;
+        let start = 0;
 
-        for (let col = 1; col <= SIZE; col++) {
+        while (start < SIZE) {
 
-            if (
+            const gem = boardData[row][start];
 
-                col < SIZE &&
-                boardData[row][col] &&
-                boardData[row][col] === boardData[row][col - 1]
+            if (!gem) {
+                start++;
+                continue;
+            }
 
+            let end = start;
+
+            while (
+                end + 1 < SIZE &&
+                boardData[row][end + 1] === gem
             ) {
 
-                count++;
-
-            } else {
-
-                if (count >= 3) {
-
-                    return true;
-
-                }
-
-                count = 1;
+                end++;
 
             }
+
+            const length = end - start + 1;
+
+            if (length >= 3) {
+
+                matches.push({
+
+                    type: "horizontal",
+
+                    gem,
+
+                    row,
+
+                    start,
+
+                    end,
+
+                    length
+
+                });
+
+            }
+
+            start = end + 1;
 
         }
 
     }
 
-    // Vertikal
+    return matches;
+
+}
+
+// ==========================
+// CARI MATCH VERTIKAL
+// ==========================
+
+function findVerticalMatches() {
+
+    const matches = [];
+
     for (let col = 0; col < SIZE; col++) {
 
-        let count = 1;
+        let start = 0;
 
-        for (let row = 1; row <= SIZE; row++) {
+        while (start < SIZE) {
 
-            if (
+            const gem = boardData[start][col];
 
-                row < SIZE &&
-                boardData[row][col] &&
-                boardData[row][col] === boardData[row - 1][col]
+            if (!gem) {
+                start++;
+                continue;
+            }
+
+            let end = start;
+
+            while (
+
+                end + 1 < SIZE &&
+                boardData[end + 1][col] === gem
 
             ) {
 
-                count++;
-
-            } else {
-
-                if (count >= 3) {
-
-                    return true;
-
-                }
-
-                count = 1;
+                end++;
 
             }
+
+            const length = end - start + 1;
+
+            if (length >= 3) {
+
+                matches.push({
+
+                    type: "vertical",
+
+                    gem,
+
+                    col,
+
+                    start,
+
+                    end,
+
+                    length
+
+                });
+
+            }
+
+            start = end + 1;
 
         }
 
     }
 
-    return false;
+    return matches;
+
+}
+
+// ==========================
+// GABUNGKAN SEMUA MATCH
+// ==========================
+
+function collectMatchedTiles(horizontal, vertical) {
+
+    const map = new Map();
+
+    horizontal.forEach(match => {
+
+        for (let c = match.start; c <= match.end; c++) {
+
+            map.set(match.row + "," + c, {
+
+                row: match.row,
+
+                col: c
+
+            });
+
+        }
+
+    });
+
+    vertical.forEach(match => {
+
+        for (let r = match.start; r <= match.end; r++) {
+
+            map.set(r + "," + match.col, {
+
+                row: r,
+
+                col: match.col
+
+            });
+
+        }
+
+    });
+
+    return [...map.values()];
+
+}
+
+// ==========================
+// DETEKSI ROCKET
+// ==========================
+
+function detectRockets(horizontal, vertical) {
+
+    const specials = [];
+
+    horizontal.forEach(match => {
+
+        if (match.length === 4) {
+
+            specials.push({
+
+                type: "rocketH",
+
+                row: match.row,
+
+                col: Math.floor((match.start + match.end) / 2)
+
+            });
+
+        }
+
+    });
+
+    vertical.forEach(match => {
+
+        if (match.length === 4) {
+
+            specials.push({
+
+                type: "rocketV",
+
+                row: Math.floor((match.start + match.end) / 2),
+
+                col: match.col
+
+            });
+
+        }
+
+    });
+
+    return specials;
+
+}
+
+// ==========================
+// DETEKSI RAINBOW
+// ==========================
+
+function detectRainbows(horizontal, vertical) {
+
+    const specials = [];
+
+    horizontal.forEach(match => {
+
+        if (match.length >= 5) {
+
+            specials.push({
+
+                type: "rainbow",
+
+                row: match.row,
+
+                col: Math.floor((match.start + match.end) / 2)
+
+            });
+
+        }
+
+    });
+
+    vertical.forEach(match => {
+
+        if (match.length >= 5) {
+
+            specials.push({
+
+                type: "rainbow",
+
+                row: Math.floor((match.start + match.end) / 2),
+
+                col: match.col
+
+            });
+
+        }
+
+    });
+
+    return specials;
+
+}
+
+// ==========================
+// DETEKSI BOMB
+// ==========================
+
+function detectBombs(tiles) {
+
+    const specials = [];
+
+    tiles.forEach(tile => {
+
+        let h = 1;
+        let v = 1;
+
+        let c = tile.col - 1;
+
+        while (
+            c >= 0 &&
+            boardData[tile.row][c] === boardData[tile.row][tile.col]
+        ) {
+
+            h++;
+            c--;
+
+        }
+
+        c = tile.col + 1;
+
+        while (
+            c < SIZE &&
+            boardData[tile.row][c] === boardData[tile.row][tile.col]
+        ) {
+
+            h++;
+            c++;
+
+        }
+
+        let r = tile.row - 1;
+
+        while (
+            r >= 0 &&
+            boardData[r][tile.col] === boardData[tile.row][tile.col]
+        ) {
+
+            v++;
+            r--;
+
+        }
+
+        r = tile.row + 1;
+
+        while (
+            r < SIZE &&
+            boardData[r][tile.col] === boardData[tile.row][tile.col]
+        ) {
+
+            v++;
+            r++;
+
+        }
+
+        if (h >= 3 && v >= 3) {
+
+            specials.push({
+
+                type: "bomb",
+
+                row: tile.row,
+
+                col: tile.col
+
+            });
+
+        }
+
+    });
+
+    return specials;
+
+}
+
+// ==========================
+// PRIORITAS SPECIAL
+// Rainbow > Bomb > Rocket
+// ==========================
+
+function mergeSpecials(rainbows, bombs, rockets) {
+
+    const map = new Map();
+
+    rainbows.forEach(s => {
+
+        map.set(s.row + "," + s.col, s);
+
+    });
+
+    bombs.forEach(s => {
+
+        const key = s.row + "," + s.col;
+
+        if (!map.has(key)) {
+
+            map.set(key, s);
+
+        }
+
+    });
+
+    rockets.forEach(s => {
+
+        const key = s.row + "," + s.col;
+
+        if (!map.has(key)) {
+
+            map.set(key, s);
+
+        }
+
+    });
+
+    return [...map.values()];
+
+}
+
+function hasMatch() {
+
+    const horizontal = findHorizontalMatches();
+    const vertical = findVerticalMatches();
+
+    return (
+        horizontal.length > 0 ||
+        vertical.length > 0
+    );
 
 }

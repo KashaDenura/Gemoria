@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Gemoria</title>
 
     <link rel="stylesheet" href="css/style.css">
+
 </head>
+
 <body>
 
 <div class="container" id="menu">
 
-    <h1>💎 GEMORIA 💎</h1>
+    <h1 class="logoTitle">
+💎 GEMORIA 💎
+</h1>
 
     <p class="studio">
         by KSN Studio
@@ -24,37 +33,102 @@
 </div>
 
 <div id="game" style="display:none;">
-  <div id="comboText"></div>
 
-    <h2>💎 GEMORIA</h2>
+    <div id="comboText"></div>
 
-    <div class="topbar">
+    <h2 class="logoTitle">
+💎 GEMORIA 💎
+</h2>
 
-        <div class="panel">
-            ⭐ Score
-            <br>
-            <span id="score">0</span>
+<div class="topBar">
+
+    <div class="lifeBox">
+
+        <div class="title">
+            ❤️ Life
         </div>
 
-        <div class="panel">
-            🎯 Target
-            <br>
-            <span id="target">500</span>
+        <span id="lifeText">
+            ❤️❤️❤️
+        </span>
+
+    </div>
+
+    <div class="hud">
+
+        <div class="card">
+
+            <div class="title">
+                ⭐ Level
+            </div>
+
+            <span id="levelText">
+                1
+            </span>
+
         </div>
 
-        <div class="panel">
-            ❤ Moves
-            <br>
-            <span id="moves">25</span>
+        <div class="card">
+
+            <div class="title">
+                🎯 Target
+            </div>
+
+            <span id="targetText">
+                250
+            </span>
+
+        </div>
+
+        <div class="card">
+
+            <div class="title">
+                👣 Moves
+            </div>
+
+            <span id="movesText">
+                50
+            </span>
+
+        </div>
+
+        <div class="card">
+
+            <div class="title">
+                💎 Score
+            </div>
+
+            <span id="scoreText">
+                0
+            </span>
+
         </div>
 
     </div>
 
+</div>
+
     <div id="board"></div>
+    
+    <div id="popup" class="popup">
+
+    <div class="popupBox">
+
+        <h2 id="popupTitle"></h2>
+
+        <p id="popupMessage"></p>
+
+        <button id="popupButton">
+            Lanjut
+        </button>
+
+    </div>
 
 </div>
 
-    <script src="js/gems.js"></script>
+</div>
+
+<script src="js/gems.js"></script>
 <script src="js/board.js"></script>
 <script src="js/match.js"></script>
 <script src="js/gravity.js"></script>
@@ -63,4 +137,5 @@
 <script src="js/script.js"></script>
 
 </body>
+
 </html>

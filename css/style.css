@@ -13,17 +13,20 @@ body{
     justify-content:center;
     align-items:center;
 
-    height:100vh;
+    min-height:100vh;
+padding:15px;
 }
 
 .container{
     text-align:center;
+    width:100%;
 }
 
 h1{
     font-size:48px;
     margin-bottom:10px;
 }
+
 
 .studio{
     color:#bbbbbb;
@@ -47,17 +50,17 @@ button:active{
     transform:scale(0.95);
 }
 
-#game{
-    text-align:center;
-}
 
 #board{
     width:336px;
-    margin:20px auto;
-
+    margin:12px auto;
     display:grid;
     grid-template-columns:repeat(8,40px);
+    grid-template-rows:repeat(8,40px);
     gap:2px;
+
+    position:relative;
+    z-index:5;
 }
 
 .tile{
@@ -82,17 +85,6 @@ button:active{
         0 0 8px rgba(255,255,255,.15);
 }
 
-.tile:hover{
-
-    transform:scale(1.08);
-
-}
-
-.selected{
-    transform: scale(1.12);
-    border:3px solid white;
-    box-shadow:0 0 20px white;
-}
 
 .gem{
 
@@ -223,70 +215,7 @@ background:linear-gradient(
 );
 }
 
-/* ===========================
-   ROCKET
-=========================== */
 
-.rocket{
-
-    position:relative;
-
-    width:34px;
-    height:34px;
-
-    border-radius:12px;
-
-    background:linear-gradient(
-        180deg,
-        #f8f8f8,
-        #c9c9c9,
-        #7d7d7d
-    );
-
-    box-shadow:
-        0 0 12px rgba(255,255,255,.45),
-        inset 0 2px 3px rgba(255,255,255,.8);
-
-}
-
-.rocket::after{
-
-    content:"🚀";
-
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    transform:translate(-50%,-50%);
-
-    font-size:22px;
-
-}
-
-.rocketH::after{
-
-    transform:
-        translate(-50%,-50%)
-        rotate(90deg);
-
-}
-
-.rocketH{
-
-    box-shadow:
-        0 0 15px #55ccff,
-        inset 0 2px 3px rgba(255,255,255,.8);
-
-}
-
-.rocketV{
-
-    box-shadow:
-        0 0 15px #66ff88,
-        inset 0 2px 3px rgba(255,255,255,.8);
-
-}
 
 @keyframes pop{
 
@@ -514,6 +443,18 @@ transform:translate(-50%,-80%) scale(1.5);
    RAINBOW
 =========================== */
 
+@keyframes rainbowSpin{
+
+from{
+transform:rotate(0deg);
+}
+
+to{
+transform:rotate(360deg);
+}
+
+}
+
 .rainbow{
 
     position:relative;
@@ -535,210 +476,128 @@ transform:translate(-50%,-80%) scale(1.5);
         red
     );
 
-    animation:
-       
-
-@keyframes popGem{
-
-0%{
-transform:scale(1);
-opacity:1;
+    animation: rainbowSpin 2s linear infinite;
 }
 
-40%{
-transform:scale(1.25);
-}
 
-100%{
-transform:scale(0);
-opacity:0;
-}
+/* ===========================
+   ROCKET
+=========================== */
 
-}
+.rocket{
 
-.pop{
+    position:relative;
 
-animation:popGem .22s forwards;
+    width:34px;
+    height:34px;
 
-}
+    border-radius:12px;
 
-@keyframes boardShake{
+    background:linear-gradient(
+        #f7f7f7,
+        #bcbcbc,
+        #6f6f6f
+    );
 
-0%{
-transform:translateX(0);
-}
-
-25%{
-transform:translateX(-4px);
-}
-
-50%{
-transform:translateX(4px);
-}
-
-75%{
-transform:translateX(-2px);
-}
-
-100%{
-transform:translateX(0);
-}
+    box-shadow:
+        0 0 15px rgba(255,255,255,.45),
+        inset 0 2px 3px rgba(255,255,255,.8);
 
 }
 
-.shake{
+.rocket::after{
 
-animation:boardShake .18s;
+    content:"🚀";
 
-}
+    position:absolute;
 
-#comboText{
+    left:50%;
+    top:50%;
 
-position:fixed;
+    transform:translate(-50%,-50%);
 
-left:50%;
-top:35%;
-
-transform:translate(-50%,-50%) scale(.5);
-
-font-size:42px;
-font-weight:bold;
-
-color:#ffd700;
-
-opacity:0;
-
-pointer-events:none;
-
-text-shadow:
-0 0 10px #fff,
-0 0 20px orange;
-
-z-index:999;
+    font-size:22px;
 
 }
 
-.comboShow{
-
-animation:comboPop .8s forwards;
-
-}
-
-@keyframes comboPop{
-
-0%{
-
-opacity:0;
-transform:translate(-50%,-50%) scale(.3);
-
-}
-
-20%{
-
-opacity:1;
-transform:translate(-50%,-50%) scale(1.3);
-
-}
-
-70%{
-
-opacity:1;
-transform:translate(-50%,-50%) scale(1);
-
-}
-
-100%{
-
-opacity:0;
-transform:translate(-50%,-70%) scale(.8);
-
-}
-
-}
-
-.bomb{
-
-background:#222;
-
-border-radius:50%;
-
-position:relative;
-
-}
-
-.bomb::after{
-
-content:"💣";
-
-font-size:34px;
-
-position:absolute;
-
-left:50%;
-top:50%;
-
-transform:translate(-50%,-50%);
-
-}
-
-/* ===== ROCKET ===== */
+/* Rocket Horizontal */
 
 .rocketH{
-    position:relative;
-    background:
-    linear-gradient(90deg,#6ecbff,#0077ff,#6ecbff);
+
+    box-shadow:
+        0 0 15px #55ccff,
+        inset 0 2px 3px rgba(255,255,255,.8);
+
 }
 
 .rocketH::after{
-    content:"🚀";
-    position:absolute;
-    left:50%;
-    top:50%;
+
     transform:
-    translate(-50%,-50%)
-    rotate(90deg);
-    font-size:22px;
+        translate(-50%,-50%)
+        rotate(90deg);
+
 }
 
 .rocketH::before{
+
     content:"";
+
     position:absolute;
+
     left:4px;
     right:4px;
+
     top:50%;
+
     height:5px;
+
     transform:translateY(-50%);
+
     background:white;
+
     border-radius:20px;
+
     opacity:.8;
+
 }
 
+/* Rocket Vertikal */
+
 .rocketV{
-    position:relative;
-    background:
-    linear-gradient(#6ecbff,#0077ff,#6ecbff);
+
+    box-shadow:
+        0 0 15px #66ff88,
+        inset 0 2px 3px rgba(255,255,255,.8);
+
 }
 
 .rocketV::after{
-    content:"🚀";
-    position:absolute;
-    left:50%;
-    top:50%;
+
     transform:translate(-50%,-50%);
-    font-size:22px;
+
 }
 
 .rocketV::before{
+
     content:"";
+
     position:absolute;
+
     top:4px;
     bottom:4px;
+
     left:50%;
+
     width:5px;
+
     transform:translateX(-50%);
+
     background:white;
+
     border-radius:20px;
+
     opacity:.8;
+
 }
 
 /* ===========================
@@ -755,7 +614,9 @@ transform:translate(-50%,-50%);
     width:100%;
     height:10px;
 
-    transform:translateY(-50%);
+    transform:
+translateY(-50%)
+scale(.5);
 
     background:
     linear-gradient(
@@ -787,7 +648,9 @@ transform:translate(-50%,-50%);
     width:10px;
     height:100%;
 
-    transform:translateX(-50%);
+    transform:
+translateX(-50%)
+scale(.5);
 
     background:
     linear-gradient(
@@ -869,4 +732,196 @@ transform:translate(-50%,-50%);
     transition:
     transform .18s ease;
 
+}
+
+.popup{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999;
+
+}
+
+.popupBox{
+
+    background:#22283a;
+
+    color:white;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    width:280px;
+
+    text-align:center;
+
+    box-shadow:0 0 20px rgba(0,0,0,.5);
+
+}
+
+.popupBox button{
+
+    margin-top:20px;
+
+    padding:10px 20px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+}
+
+.popup{
+
+    animation:popupFade .25s;
+
+}
+
+.popupBox{
+
+    animation:popupScale .25s;
+
+}
+
+.popupBox h2{
+
+    margin-bottom:10px;
+
+}
+
+.popupBox p{
+
+    line-height:1.6;
+
+    margin:15px 0;
+
+}
+
+.popupBox button{
+
+    background:#45b8ff;
+
+    color:white;
+
+    transition:.2s;
+
+}
+
+.popupBox button:hover{
+
+    transform:scale(1.08);
+
+}
+
+.popupBox button:active{
+
+    transform:scale(.95);
+
+}
+
+@keyframes popupFade{
+
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+@keyframes popupScale{
+
+    from{
+
+        transform:scale(.75);
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* ===========================
+   TOP BAR
+=========================== */
+
+.topBar{
+    width:100%;
+    margin-bottom:12px;
+}
+
+.lifeBox{
+    background:#1f2434;
+    border:2px solid gold;
+    border-radius:15px;
+    padding:10px;
+    text-align:center;
+    box-shadow:0 0 15px rgba(255,215,0,.35);
+}
+
+.hud{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.card{
+    background:#1f2434;
+    border:2px solid rgba(255,255,255,.15);
+    border-radius:15px;
+    padding:12px;
+    text-align:center;
+    transition:.2s;
+}
+
+.card:hover{
+    transform:scale(1.03);
+}
+
+.title{
+    font-size:14px;
+    color:#cfcfcf;
+    margin-bottom:6px;
+}
+
+.card span,
+.lifeBox span{
+    font-size:24px;
+    font-weight:bold;
+    color:#ffe76d;
+}
+
+#game{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    width:100%;
+    max-width:380px;
+    margin:auto;
 }

@@ -6,7 +6,3 @@ const gems = [
     "purple",
     "orange"
 ];
-
-function randomGem() {
-    return gems[Math.floor(Math.random() * gems.length)];
-}
