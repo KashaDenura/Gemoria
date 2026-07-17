@@ -293,6 +293,8 @@ setTimeout(() => {
 
     renderBoard();
 
+    gameLocked = false;   // WAJIB
+
 }, 150);
 
 } // <-- PENUTUP FUNGSI swap()

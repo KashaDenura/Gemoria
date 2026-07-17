@@ -197,8 +197,6 @@ function checkGameState() {
 
                 moves = 50;
 
-                score = 0;
-
                 updateHUD();
 
                 createBoard();
